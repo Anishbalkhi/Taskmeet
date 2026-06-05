@@ -48,7 +48,7 @@ const Header = () => {
 
     return (
         <header
-            className="h-14 flex items-center justify-between px-6 sticky top-0 z-40"
+            className="h-14 flex items-center justify-between px-3 sm:px-6 sticky top-0 z-40"
             style={{
                 background: 'var(--bg-primary)',
                 borderBottom: '1px solid var(--border-primary)',
@@ -91,7 +91,7 @@ const Header = () => {
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -10 }}
                                 transition={{ duration: 0.15 }}
-                                className="absolute left-0 top-10 rounded-lg p-2 w-64 z-50"
+                                className="absolute left-0 top-10 rounded-lg p-2 w-56 sm:w-64 z-50 max-w-[calc(100vw-1rem)]"
                                 style={{
                                     background: 'var(--bg-elevated)',
                                     border: '1px solid var(--border-primary)',

@@ -94,19 +94,19 @@ const Dashboard = () => {
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-6 py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
 
-        <div className="mb-10">
-          <h1 className="text-5xl font-extrabold text-gray-900 mb-3">
+        <div className="mb-8 sm:mb-10">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 mb-2 sm:mb-3">
             Your Dashboard
           </h1>
-          <p className="text-gray-600 text-xl">
+          <p className="text-gray-600 text-base sm:text-xl">
             Manage your tasks and workspaces all in one place.
           </p>
         </div>
 
         {/* Live stat cards */}
-        <div className="grid md:grid-cols-3 gap-6 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12">
           {stats.map((stat, index) => (
             <motion.div
               key={index}
@@ -127,40 +127,41 @@ const Dashboard = () => {
         </div>
 
         {/* Create workspace CTA */}
-        <div className="mb-12">
+        <div className="mb-8 sm:mb-12">
           <motion.div
-            className="bg-white rounded-3xl shadow-xl p-8 border border-gray-100 relative overflow-hidden group cursor-pointer hover:shadow-2xl transition-all"
+            className="bg-white rounded-2xl sm:rounded-3xl shadow-xl p-5 sm:p-8 border border-gray-100 relative overflow-hidden group cursor-pointer hover:shadow-2xl transition-all"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4 }}
             onClick={() => navigate('/dashboard/create-workspace')}
           >
-            <div className="flex items-center gap-4 mb-4">
-              <div className="p-3 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl shadow-lg">
-                <LayoutGrid className="w-8 h-8 text-white" />
+            <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+              <div className="p-2.5 sm:p-3 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl shadow-lg flex-shrink-0">
+                <LayoutGrid className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900">Create Workspace</h3>
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-900">Create Workspace</h3>
             </div>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600 text-sm sm:text-base mb-4 sm:mb-6">
               Organize your team and projects in dedicated workspaces.
             </p>
-            <button className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all flex items-center gap-2 group-hover:gap-3">
+            <button className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl font-semibold hover:shadow-lg transition-all flex items-center gap-2 group-hover:gap-3 text-sm sm:text-base">
               New Workspace
-              <Plus className="w-5 h-5" />
+              <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
           </motion.div>
         </div>
 
         {/* Workspaces list */}
-        <div className="mb-10">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-3xl font-bold text-gray-900">Your Workspaces</h2>
+        <div className="mb-8 sm:mb-10">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-5 sm:mb-6">
+            <h2 className="text-xl sm:text-3xl font-bold text-gray-900">Your Workspaces</h2>
             <button
               onClick={() => navigate('/dashboard/create-workspace')}
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white px-5 py-2.5 rounded-xl font-semibold hover:shadow-lg transition-all"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl font-semibold hover:shadow-lg transition-all text-sm sm:text-base"
             >
-              <Plus className="w-5 h-5" />
-              Create Workspace
+              <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="hidden xs:inline">Create Workspace</span>
+              <span className="xs:hidden">New</span>
             </button>
           </div>
 
@@ -235,9 +236,9 @@ const Dashboard = () => {
         </div>
 
         {/* Recent tasks summary */}
-        <div className="mt-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">Quick Stats</h2>
-          <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+        <div className="mt-8 sm:mt-12">
+          <h2 className="text-xl sm:text-3xl font-bold text-gray-900 mb-4 sm:mb-6">Quick Stats</h2>
+          <div className="bg-white rounded-2xl shadow-lg p-5 sm:p-8 border border-gray-100">
             {statsLoading ? (
               <div className="flex items-center justify-center py-6">
                 <div className="animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-purple-600" />
