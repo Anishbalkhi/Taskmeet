@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MeetTask – Project Architecture & Flow</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue: #2563eb;
+      --indigo: #4f46e5;
+      --purple: #7c3aed;
+      --cyan: #0891b2;
+      --green: #059669;
+      --amber: #d97706;
+      --red: #dc2626;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      font-size: 10.5pt;
+      line-height: 1.7;
+      color: var(--gray-800);
+      background: white;
+    }
+
+    /* ─── COVER PAGE ─────────────────────────────── */
+    .cover {
+      height: 100vh;
+      min-height: 297mm;
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f2744 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 60px 40px;
+      page-break-after: always;
+      position: relative;
+      overflow: hidden;
+    }
+    .cover::before {
+      content: '';
+      position: absolute;
+      width: 500px; height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(99,102,241,0.25) 0%, transparent 70%);
+      top: -100px; right: -100px;
+    }
+    .cover::after {
+      content: '';
+      position: absolute;
+      width: 400px; height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(6,182,212,0.2) 0%, transparent 70%);
+      bottom: -80px; left: -80px;
+    }
+    .cover-badge {
+      background: rgba(99,102,241,0.2);
+      border: 1px solid rgba(99,102,241,0.5);
+      border-radius: 100px;
+      padding: 6px 20px;
+      color: #a5b4fc;
+      font-size: 9pt;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+    }
+    .cover h1 {
+      font-size: 52pt;
+      font-weight: 800;
+      color: white;
+      letter-spacing: -1px;
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+    .cover h1 span { color: #818cf8; }
+    .cover .subtitle {
+      font-size: 14pt;
+      color: #94a3b8;
+      max-width: 500px;
+      margin-bottom: 40px;
+      line-height: 1.6;
+    }
+    .cover-divider {
+      width: 80px; height: 3px;
+      background: linear-gradient(90deg, #6366f1, #06b6d4);
+      border-radius: 10px;
+      margin: 0 auto 40px;
+    }
+    .cover-meta {
+      display: flex;
+      gap: 40px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .cover-meta-item {
+      text-align: center;
+    }
+    .cover-meta-item .label {
+      font-size: 8pt;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+    .cover-meta-item .value {
+      font-size: 10pt;
+      color: #e2e8f0;
+      font-weight: 500;
+    }
+    .cover-stack {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 36px;
+    }
+    .stack-tag {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 6px;
+      padding: 5px 14px;
+      font-size: 8.5pt;
+      color: #cbd5e1;
+      font-weight: 500;
+    }
+
+    /* ─── MAIN CONTENT ───────────────────────────── */
+    .content {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 48px 48px 60px;
+    }
+
+    /* ─── SECTION HEADERS ────────────────────────── */
+    .section {
+      margin-bottom: 44px;
+      page-break-inside: avoid;
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--gray-100);
+    }
+    .section-icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .section-header h2 {
+      font-size: 16pt;
+      font-weight: 700;
+      color: var(--gray-900);
+    }
+    .section-header .section-num {
+      font-size: 9pt;
+      font-weight: 600;
+      color: var(--gray-300);
+      letter-spacing: 1px;
+    }
+
+    /* ─── INTRO BOX ──────────────────────────────── */
+    .intro-box {
+      background: linear-gradient(135deg, #eff6ff, #eef2ff);
+      border-left: 4px solid var(--indigo);
+      border-radius: 0 10px 10px 0;
+      padding: 20px 24px;
+      margin-bottom: 32px;
+    }
+    .intro-box p { font-size: 10.5pt; color: var(--gray-700); line-height: 1.8; }
+
+    /* ─── TABLES ─────────────────────────────────── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 9.5pt;
+    }
+    thead th {
+      background: var(--gray-900);
+      color: white;
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 9pt;
+      letter-spacing: 0.5px;
+    }
+    thead th:first-child { border-radius: 6px 0 0 0; }
+    thead th:last-child  { border-radius: 0 6px 0 0; }
+    tbody tr:nth-child(even) { background: var(--gray-50); }
+    tbody tr:hover { background: #eff6ff; }
+    tbody td {
+      padding: 9px 14px;
+      border-bottom: 1px solid var(--gray-200);
+      color: var(--gray-700);
+      vertical-align: top;
+    }
+    tbody td:first-child { font-weight: 600; color: var(--gray-900); }
+
+    /* ─── CODE / MONO ────────────────────────────── */
+    code {
+      font-family: 'Fira Code', monospace;
+      font-size: 8.5pt;
+      background: var(--gray-100);
+      border: 1px solid var(--gray-200);
+      border-radius: 4px;
+      padding: 1px 6px;
+      color: #5b21b6;
+    }
+    .code-block {
+      background: #0f172a;
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin: 14px 0;
+      font-family: 'Fira Code', monospace;
+      font-size: 8.5pt;
+      line-height: 1.7;
+      color: #e2e8f0;
+      overflow-x: auto;
+    }
+    .code-block .comment { color: #64748b; }
+    .code-block .keyword { color: #818cf8; }
+    .code-block .string  { color: #34d399; }
+    .code-block .arrow   { color: #f59e0b; }
+
+    /* ─── FLOW DIAGRAM ───────────────────────────── */
+    .flow {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin: 18px 0;
+    }
+    .flow-step {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .flow-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .flow-dot {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+    }
+    .flow-line {
+      width: 2px;
+      background: var(--gray-200);
+      flex-grow: 1;
+      min-height: 20px;
+      margin: 4px 0;
+    }
+    .flow-body {
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 10px;
+      flex: 1;
+    }
+    .flow-body h4 { font-size: 10pt; font-weight: 600; color: var(--gray-900); margin-bottom: 4px; }
+    .flow-body p  { font-size: 9pt; color: var(--gray-600); line-height: 1.6; }
+
+    /* ─── CARDS ──────────────────────────────────── */
+    .cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin: 16px 0;
+    }
+    .card {
+      border: 1px solid var(--gray-200);
+      border-radius: 10px;
+      padding: 16px;
+      background: white;
+    }
+    .card-header {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 10px;
+    }
+    .card-icon {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+    }
+    .card h3 { font-size: 10pt; font-weight: 700; color: var(--gray-900); }
+    .card ul { padding-left: 16px; }
+    .card li { font-size: 9pt; color: var(--gray-600); margin-bottom: 3px; }
+
+    /* ─── PERMISSION TABLE ───────────────────────── */
+    .perm-table th { background: #1e3a5f; }
+    .perm-yes { color: var(--green); font-weight: 700; text-align: center; }
+    .perm-no  { color: var(--gray-300); text-align: center; }
+
+    /* ─── ROUTE TABLE ───────────────────────────── */
+    .method {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 7.5pt;
+      font-weight: 700;
+      font-family: 'Fira Code', monospace;
+    }
+    .get    { background: #dcfce7; color: #166534; }
+    .post   { background: #dbeafe; color: #1e40af; }
+    .put    { background: #fef3c7; color: #92400e; }
+    .patch  { background: #f3e8ff; color: #6b21a8; }
+    .delete { background: #fee2e2; color: #991b1b; }
+
+    /* ─── BADGES ─────────────────────────────────── */
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 100px;
+      font-size: 8pt;
+      font-weight: 600;
+    }
+    .badge-blue   { background: #dbeafe; color: #1d4ed8; }
+    .badge-green  { background: #dcfce7; color: #15803d; }
+    .badge-amber  { background: #fef3c7; color: #b45309; }
+    .badge-purple { background: #ede9fe; color: #6d28d9; }
+    .badge-red    { background: #fee2e2; color: #b91c1c; }
+
+    /* ─── CALLOUT ────────────────────────────────── */
+    .callout {
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 16px 0;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .callout-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .callout p    { font-size: 9.5pt; color: var(--gray-700); line-height: 1.7; }
+    .callout-blue   { background: #eff6ff; border-left: 3px solid var(--blue); }
+    .callout-green  { background: #f0fdf4; border-left: 3px solid var(--green); }
+    .callout-purple { background: #f5f3ff; border-left: 3px solid var(--purple); }
+
+    /* ─── JOURNEY ────────────────────────────────── */
+    .journey {
+      display: flex;
+      gap: 0;
+      align-items: stretch;
+      margin: 18px 0;
+      flex-wrap: wrap;
+    }
+    .journey-step {
+      flex: 1;
+      min-width: 100px;
+      background: linear-gradient(135deg, #1e3a5f, #1e3a8a);
+      color: white;
+      padding: 14px 12px;
+      position: relative;
+      text-align: center;
+    }
+    .journey-step + .journey-step { margin-left: 2px; }
+    .journey-step .js-icon { font-size: 20px; display: block; margin-bottom: 6px; }
+    .journey-step .js-label { font-size: 8pt; font-weight: 600; line-height: 1.3; }
+    .journey-arrow {
+      display: flex; align-items: center;
+      padding: 0 2px;
+      color: var(--gray-400);
+      font-size: 14px;
+    }
+
+    /* ─── FOOTER ─────────────────────────────────── */
+    .footer {
+      text-align: center;
+      padding: 32px 48px 24px;
+      border-top: 1px solid var(--gray-100);
+      color: var(--gray-300);
+      font-size: 8.5pt;
+    }
+
+    /* ─── PRINT ──────────────────────────────────── */
+    @media print {
+      @page { margin: 0; size: A4; }
+      body { font-size: 9.5pt; }
+      .cover { page-break-after: always; min-height: 100vh; }
+      .section { page-break-inside: avoid; }
+      .cards { page-break-inside: avoid; }
+      .flow-step { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!--  COVER PAGE                                     -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-badge">Project Documentation</div>
+  <h1>Meet<span>Task</span></h1>
+  <p class="subtitle">
+    A full-stack collaborative workspace and meeting management platform built for modern teams.
+  </p>
+  <div class="cover-divider"></div>
+  <div class="cover-meta">
+    <div class="cover-meta-item">
+      <div class="label">Frontend</div>
+      <div class="value">React 19 + Vite</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="label">Backend</div>
+      <div class="value">Node.js + Express</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="label">Database</div>
+      <div class="value">MongoDB + Mongoose</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="label">Auth</div>
+      <div class="value">JWT + Email OTP</div>
+    </div>
+  </div>
+  <div class="cover-stack">
+    <span class="stack-tag">React Router v7</span>
+    <span class="stack-tag">Context API</span>
+    <span class="stack-tag">Tailwind CSS</span>
+    <span class="stack-tag">Framer Motion</span>
+    <span class="stack-tag">bcryptjs</span>
+    <span class="stack-tag">Nodemailer</span>
+    <span class="stack-tag">Express Validator</span>
+    <span class="stack-tag">REST API</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!--  MAIN CONTENT                                   -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="content">
+
+  <!-- 1. PROJECT OVERVIEW -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#eff6ff">🎯</div>
+      <div>
+        <div class="section-num">SECTION 01</div>
+        <h2>Project Overview</h2>
+      </div>
+    </div>
+    <div class="intro-box">
+      <p>
+        <strong>MeetTask</strong> is a collaborative productivity platform that combines <strong>workspace management</strong>,
+        <strong>task tracking</strong>, <strong>meeting scheduling</strong>, and <strong>team communication</strong> into a single
+        unified application. It implements role-based access control, email-verified authentication, real-time notification 
+        delivery, and a fully responsive UI — making it production-ready and interview-demonstrable.
+      </p>
+    </div>
+    <div class="cards">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon" style="background:#eff6ff">🏢</div>
+          <h3>Core Features</h3>
+        </div>
+        <ul>
+          <li>Multi-workspace support per user</li>
+          <li>Role-based member management</li>
+          <li>Task creation, assignment & tracking</li>
+          <li>Meeting scheduling with participants</li>
+          <li>Workspace invitation system</li>
+          <li>In-app notification center</li>
+          <li>User profile management</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon" style="background:#f0fdf4">🛡️</div>
+          <h3>Security Features</h3>
+        </div>
+        <ul>
+          <li>JWT-based stateless authentication</li>
+          <li>Email verification on signup</li>
+          <li>Forgot/reset password via secure token</li>
+          <li>Password hashing with bcryptjs</li>
+          <li>Protected routes (frontend guard)</li>
+          <li>Auth middleware on all private APIs</li>
+          <li>Input validation (express-validator)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. TECH STACK -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#f5f3ff">⚙️</div>
+      <div>
+        <div class="section-num">SECTION 02</div>
+        <h2>Technology Stack</h2>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Technology</th>
+          <th>Purpose</th>
+          <th>Version</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>UI Framework</td><td>React</td><td>Component-based SPA</td><td>v19</td></tr>
+        <tr><td>Build Tool</td><td>Vite</td><td>Dev server + bundling</td><td>v7</td></tr>
+        <tr><td>Routing</td><td>React Router</td><td>Client-side navigation</td><td>v7</td></tr>
+        <tr><td>Styling</td><td>Tailwind CSS</td><td>Utility-first CSS</td><td>v4</td></tr>
+        <tr><td>Animation</td><td>Framer Motion</td><td>Page & UI animations</td><td>v12</td></tr>
+        <tr><td>HTTP Client</td><td>Axios</td><td>Frontend API calls</td><td>v1.13</td></tr>
+        <tr><td>Icons</td><td>Lucide React + React Icons</td><td>Icon library</td><td>—</td></tr>
+        <tr><td>Runtime</td><td>Node.js</td><td>JavaScript backend</td><td>—</td></tr>
+        <tr><td>Framework</td><td>Express.js</td><td>REST API server</td><td>v4</td></tr>
+        <tr><td>Database</td><td>MongoDB (Atlas)</td><td>NoSQL document store</td><td>—</td></tr>
+        <tr><td>ODM</td><td>Mongoose</td><td>Schema + query layer</td><td>v8</td></tr>
+        <tr><td>Auth</td><td>JWT + bcryptjs</td><td>Token auth + password hashing</td><td>—</td></tr>
+        <tr><td>Email</td><td>Nodemailer / SendGrid</td><td>Transactional emails</td><td>—</td></tr>
+        <tr><td>Validation</td><td>express-validator</td><td>Server-side input validation</td><td>—</td></tr>
+        <tr><td>Logging</td><td>Morgan</td><td>HTTP request logging</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3. BACKEND ARCHITECTURE -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#fef3c7">🔧</div>
+      <div>
+        <div class="section-num">SECTION 03</div>
+        <h2>Backend Architecture</h2>
+      </div>
+    </div>
+    <div class="callout callout-blue">
+      <span class="callout-icon">📐</span>
+      <p>The backend follows a clean <strong>layered architecture</strong>: <code>server.js → Routes → Middleware → Controllers → Services/Models → MongoDB</code>. This separation of concerns makes the codebase highly maintainable and testable.</p>
+    </div>
+    <div class="code-block">
+<span class="comment">// Entry point: server.js</span>
+<span class="keyword">import</span> express <span class="keyword">from</span> <span class="string">'express'</span>;
+<span class="keyword">import</span> connectDB <span class="keyword">from</span> <span class="string">'./config/db.js'</span>;
+
+app.<span class="keyword">use</span>(<span class="string">'/api/auth'</span>,          authRoutes);       <span class="comment">// Authentication</span>
+app.<span class="keyword">use</span>(<span class="string">'/api/workspaces'</span>,    workspaceRoutes);   <span class="comment">// Workspace CRUD</span>
+app.<span class="keyword">use</span>(<span class="string">'/api/tasks'</span>,         taskRoutes);       <span class="comment">// Task management</span>
+app.<span class="keyword">use</span>(<span class="string">'/api/meetings'</span>,      meetingRoutes);    <span class="comment">// Meeting scheduling</span>
+app.<span class="keyword">use</span>(<span class="string">'/api/notifications'</span>,  notificationRoutes); <span class="comment">// Notifications</span>
+    </div>
+    <table>
+      <thead>
+        <tr><th>Folder</th><th>Description</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>config/</code></td><td>MongoDB connection setup using Mongoose</td></tr>
+        <tr><td><code>models/</code></td><td>Mongoose schemas: User, Workspace, Task, Meeting, Notification</td></tr>
+        <tr><td><code>routes/</code></td><td>Express route definitions with validation rules</td></tr>
+        <tr><td><code>controllers/</code></td><td>Request handlers — extract inputs, call model/service, return response</td></tr>
+        <tr><td><code>middleware/</code></td><td><code>authMiddleware.js</code> (JWT verify) + <code>errorHandler.js</code></td></tr>
+        <tr><td><code>services/</code></td><td><code>emailService.js</code> — sends verification & reset emails</td></tr>
+        <tr><td><code>utils/</code></td><td>Shared helper utilities</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 4. DATABASE MODELS -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#f0fdf4">🗄️</div>
+      <div>
+        <div class="section-num">SECTION 04</div>
+        <h2>Database Models (MongoDB)</h2>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr><th>Model</th><th>Key Fields</th><th>Relationships</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>User</td>
+          <td>name, email, password, role (USER/ADMIN), is_email_verified, email_verification_token, reset_password_token, bio, phone, location, website</td>
+          <td>Referenced by all models</td>
+        </tr>
+        <tr>
+          <td>Workspace</td>
+          <td>name, description, owner (ref User), members[ {user, role: owner/admin/member, joinedAt} ], virtual: memberCount</td>
+          <td>owner → User; members[].user → User</td>
+        </tr>
+        <tr>
+          <td>Task</td>
+          <td>title, description, status (Todo/InProgress/Completed), priority (Low/Medium/High), dueDate, workspace (ref), assignedTo (ref User), createdBy (ref User)</td>
+          <td>workspace → Workspace; assignedTo, createdBy → User</td>
+        </tr>
+        <tr>
+          <td>Meeting</td>
+          <td>title, startTime, participants[ ] (email strings), host (ref User), workspace (ref), status (scheduled/active/ended)</td>
+          <td>host → User; workspace → Workspace</td>
+        </tr>
+        <tr>
+          <td>Notification</td>
+          <td>recipient (ref User), type (task_assigned/workspace_invite), read (bool), task (ref), workspace (ref), invitedBy (ref User), inviteRole, inviteStatus (pending/accepted/declined), message</td>
+          <td>Links User, Task, and Workspace</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 5. API ENDPOINTS -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#fef2f2">🔌</div>
+      <div>
+        <div class="section-num">SECTION 05</div>
+        <h2>REST API Endpoints</h2>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="method post">POST</span></td><td><code>/api/auth/register</code></td><td>—</td><td>Register user, send verification email</td></tr>
+        <tr><td><span class="method post">POST</span></td><td><code>/api/auth/login</code></td><td>—</td><td>Login, return JWT token</td></tr>
+        <tr><td><span class="method get">GET</span></td><td><code>/api/auth/verify-email</code></td><td>—</td><td>Verify email using token from URL</td></tr>
+        <tr><td><span class="method post">POST</span></td><td><code>/api/auth/forgot-password</code></td><td>—</td><td>Send password reset link to email</td></tr>
+        <tr><td><span class="method post">POST</span></td><td><code>/api/auth/reset-password</code></td><td>—</td><td>Reset password with token</td></tr>
+        <tr><td><span class="method get">GET</span></td><td><code>/api/auth/me</code></td><td>✅ JWT</td><td>Get current user profile</td></tr>
+        <tr><td><span class="method put">PUT</span></td><td><code>/api/auth/me</code></td><td>✅ JWT</td><td>Update user profile</td></tr>
+        <tr><td><span class="method post">POST</span></td><td><code>/api/auth/change-password</code></td><td>✅ JWT</td><td>Change password (authenticated)</td></tr>
+        <tr><td><span class="method get">GET</span></td><td><code>/api/workspaces</code></td><td>✅ JWT</td><td>Get all workspaces for user</td></tr>
+        <tr><td><span class="method post">POST</span></td><td><code>/api/workspaces</code></td><td>✅ JWT</td><td>Create new workspace</td></tr>
+        <tr><td><span class="method post">POST</span></td><td><code>/api/workspaces/:id/invite</code></td><td>✅ JWT</td><td>Invite member, send notification</td></tr>
+        <tr><td><span class="method get">GET</span></td><td><code>/api/tasks</code></td><td>✅ JWT</td><td>Get tasks for a workspace</td></tr>
+        <tr><td><span class="method post">POST</span></td><td><code>/api/tasks</code></td><td>✅ JWT</td><td>Create task in workspace</td></tr>
+        <tr><td><span class="method patch">PATCH</span></td><td><code>/api/tasks/:id</code></td><td>✅ JWT</td><td>Update task status/fields</td></tr>
+        <tr><td><span class="method delete">DELETE</span></td><td><code>/api/tasks/:id</code></td><td>✅ JWT</td><td>Delete a task</td></tr>
+        <tr><td><span class="method get">GET</span></td><td><code>/api/meetings</code></td><td>✅ JWT</td><td>Get meetings for user</td></tr>
+        <tr><td><span class="method post">POST</span></td><td><code>/api/meetings</code></td><td>✅ JWT</td><td>Schedule a meeting</td></tr>
+        <tr><td><span class="method get">GET</span></td><td><code>/api/notifications</code></td><td>✅ JWT</td><td>Get user notifications</td></tr>
+        <tr><td><span class="method patch">PATCH</span></td><td><code>/api/notifications/:id/read</code></td><td>✅ JWT</td><td>Mark notification as read</td></tr>
+        <tr><td><span class="method post">POST</span></td><td><code>/api/notifications/:id/respond</code></td><td>✅ JWT</td><td>Accept/decline workspace invite</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 6. AUTH FLOW -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#f0fdf4">🔐</div>
+      <div>
+        <div class="section-num">SECTION 06</div>
+        <h2>Authentication Flow</h2>
+      </div>
+    </div>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-left">
+          <div class="flow-dot" style="background:#6366f1">1</div>
+          <div class="flow-line"></div>
+        </div>
+        <div class="flow-body">
+          <h4>Registration</h4>
+          <p>User submits name, email, password. <code>express-validator</code> validates input. Password is hashed using <strong>bcryptjs</strong> (salt rounds = 10). User is saved to MongoDB. An <strong>email verification token</strong> is generated (crypto) and stored with expiry. Nodemailer/SendGrid sends a verification link.</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left">
+          <div class="flow-dot" style="background:#0891b2">2</div>
+          <div class="flow-line"></div>
+        </div>
+        <div class="flow-body">
+          <h4>Email Verification</h4>
+          <p>User clicks the link in the email. The <code>GET /api/auth/verify-email?token=...</code> endpoint is called. Token is matched and expiry is checked. <code>is_email_verified</code> is set to <code>true</code> in the DB. User is redirected to the verified page.</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left">
+          <div class="flow-dot" style="background:#059669">3</div>
+          <div class="flow-line"></div>
+        </div>
+        <div class="flow-body">
+          <h4>Login</h4>
+          <p>User submits email + password. Server fetches user (with <code>select: '+password'</code>). Compares using <code>bcrypt.compare()</code>. Checks email is verified. If valid, signs a <strong>JWT</strong> (with user ID payload) and returns it. Frontend stores the token in <code>localStorage</code>.</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left">
+          <div class="flow-dot" style="background:#d97706">4</div>
+          <div class="flow-line"></div>
+        </div>
+        <div class="flow-body">
+          <h4>Authenticated Requests</h4>
+          <p><code>axiosClient</code> attaches the JWT as a <code>Bearer</code> token in every request header. The <code>authMiddleware</code> on the server verifies the token using <code>jwt.verify()</code>, extracts <code>req.user</code>, and passes it to the controller. Invalid/expired tokens return <code>401 Unauthorized</code>.</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left">
+          <div class="flow-dot" style="background:#dc2626">5</div>
+        </div>
+        <div class="flow-body">
+          <h4>Forgot / Reset Password</h4>
+          <p>User requests a reset — server generates a secure token, saves it with expiry, and emails a link. User submits new password with the token. Server validates the token, hashes the new password, and saves it. Old token is cleared to prevent reuse.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. FRONTEND ARCHITECTURE -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#f5f3ff">🖥️</div>
+      <div>
+        <div class="section-num">SECTION 07</div>
+        <h2>Frontend Architecture</h2>
+      </div>
+    </div>
+    <div class="callout callout-purple">
+      <span class="callout-icon">⚛️</span>
+      <p>The frontend uses the <strong>React Context API</strong> as its global state management solution — no Redux. All application state is provided via nested context providers wrapping the entire component tree.</p>
+    </div>
+    <div class="code-block">
+<span class="comment">// App.jsx — Provider hierarchy</span>
+&lt;<span class="keyword">AuthProvider</span>&gt;              <span class="comment">// Token + user data</span>
+  &lt;<span class="keyword">WorkspaceProvider</span>&gt;        <span class="comment">// Workspaces + tasks</span>
+    &lt;<span class="keyword">NotificationProvider</span>&gt;    <span class="comment">// User notifications</span>
+      &lt;<span class="keyword">RoleProvider</span>&gt;          <span class="comment">// RBAC permissions</span>
+        &lt;<span class="keyword">AppRoutes</span> /&gt;         <span class="comment">// All pages</span>
+      &lt;/<span class="keyword">RoleProvider</span>&gt;
+    &lt;/<span class="keyword">NotificationProvider</span>&gt;
+  &lt;/<span class="keyword">WorkspaceProvider</span>&gt;
+&lt;/<span class="keyword">AuthProvider</span>&gt;
+    </div>
+    <table>
+      <thead>
+        <tr><th>Context</th><th>State Managed</th><th>Key Functions</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>AuthContext</td>
+          <td>JWT token, user profile object, loading state</td>
+          <td><code>login()</code>, <code>register()</code>, <code>logout()</code>, <code>updateUser()</code>, <code>fetchCurrentUser()</code></td>
+        </tr>
+        <tr>
+          <td>WorkspaceContext</td>
+          <td>workspaces[], currentWorkspace, tasks[], loading flags</td>
+          <td><code>fetchWorkspaces()</code>, <code>refreshTasks()</code>, <code>addWorkspaceObj()</code>, <code>setCurrentWorkspace()</code></td>
+        </tr>
+        <tr>
+          <td>NotificationContext</td>
+          <td>notifications[], unread count</td>
+          <td>Fetch on mount, mark as read, respond to invites</td>
+        </tr>
+        <tr>
+          <td>RoleContext</td>
+          <td>role (ADMIN/HOST/PARTICIPANT), computed permissions</td>
+          <td><code>can("permission")</code> — returns boolean for any permission key</td>
+        </tr>
+        <tr>
+          <td>ThemeContext</td>
+          <td>light / dark mode toggle</td>
+          <td>Persists preference in <code>localStorage</code></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 8. PAGES & ROUTING -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#fff7ed">🛣️</div>
+      <div>
+        <div class="section-num">SECTION 08</div>
+        <h2>Pages &amp; Routing</h2>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr><th>Route</th><th>Page Component</th><th>Access</th><th>Description</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>/</code></td><td>Home</td><td>Public</td><td>Landing page with features, hero, CTA</td></tr>
+        <tr><td><code>/login</code></td><td>Login</td><td>Public</td><td>Email + password login form</td></tr>
+        <tr><td><code>/register</code></td><td>Register</td><td>Public</td><td>Signup form with validation</td></tr>
+        <tr><td><code>/forgot-password</code></td><td>ForgotPassword</td><td>Public</td><td>Request password reset email</td></tr>
+        <tr><td><code>/reset-password</code></td><td>ResetPassword</td><td>Public</td><td>Set new password with token</td></tr>
+        <tr><td><code>/verify-info</code></td><td>VerifyInfo</td><td>Public</td><td>Post-registration: check your email</td></tr>
+        <tr><td><code>/verify-email</code></td><td>VerifyEmail</td><td>Public</td><td>Handles email link click</td></tr>
+        <tr><td><code>/dashboard</code></td><td>UserHome</td><td>🔒 Protected</td><td>Personal task overview, quick stats</td></tr>
+        <tr><td><code>/dashboard/home</code></td><td>UserHome</td><td>🔒 Protected</td><td>Same as above</td></tr>
+        <tr><td><code>/dashboard/team</code></td><td>TeamHome</td><td>🔒 Protected</td><td>Team view: all tasks, members, meetings</td></tr>
+        <tr><td><code>/dashboard/workspace</code></td><td>Workspace</td><td>🔒 Protected</td><td>Workspace settings, member management</td></tr>
+        <tr><td><code>/dashboard/create-workspace</code></td><td>CreateWorkspace</td><td>🔒 Protected</td><td>Create a new workspace</td></tr>
+        <tr><td><code>/dashboard/profile</code></td><td>Profile</td><td>🔒 Protected</td><td>Edit bio, change password, profile info</td></tr>
+        <tr><td><code>/dashboard/notifications</code></td><td>Notifications</td><td>🔒 Protected</td><td>Workspace invites + task assignments</td></tr>
+        <tr><td><code>/create-meeting</code></td><td>CreateMeeting</td><td>Public route</td><td>Schedule a meeting with participants</td></tr>
+      </tbody>
+    </table>
+    <div class="callout callout-green">
+      <span class="callout-icon">🛡️</span>
+      <p>All <code>/dashboard/*</code> routes are wrapped in a <code>MainLayout</code> component which includes the sidebar, top navigation, and a <strong>ProtectedRoute</strong> guard. If the user is not authenticated, they are redirected to <code>/login</code>.</p>
+    </div>
+  </div>
+
+  <!-- 9. ROLE-BASED ACCESS CONTROL -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#fef3c7">👑</div>
+      <div>
+        <div class="section-num">SECTION 09</div>
+        <h2>Role-Based Access Control (RBAC)</h2>
+      </div>
+    </div>
+    <p style="margin-bottom:12px; font-size:9.5pt; color:var(--gray-600);">
+      Roles are derived dynamically from the user's membership role in the <strong>current workspace</strong>. The <code>RoleContext</code> exposes a <code>can("permission")</code> helper that components use to conditionally render actions.
+    </p>
+    <table class="perm-table">
+      <thead>
+        <tr>
+          <th>Permission</th>
+          <th style="text-align:center"><span class="badge badge-amber">ADMIN</span></th>
+          <th style="text-align:center"><span class="badge badge-purple">HOST</span></th>
+          <th style="text-align:center"><span class="badge badge-blue">PARTICIPANT</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>createUser / deactivateUser</td><td class="perm-yes">✓</td><td class="perm-no">—</td><td class="perm-no">—</td></tr>
+        <tr><td>viewAllMeetings / deleteAnyMeeting</td><td class="perm-yes">✓</td><td class="perm-no">—</td><td class="perm-no">—</td></tr>
+        <tr><td>viewAnalytics</td><td class="perm-yes">✓</td><td class="perm-no">—</td><td class="perm-no">—</td></tr>
+        <tr><td>createMeeting / inviteParticipants</td><td class="perm-yes">✓</td><td class="perm-yes">✓</td><td class="perm-no">—</td></tr>
+        <tr><td>startEndMeeting</td><td class="perm-yes">✓</td><td class="perm-yes">✓</td><td class="perm-no">—</td></tr>
+        <tr><td>assignTask / modifyTask</td><td class="perm-yes">✓</td><td class="perm-yes">✓</td><td class="perm-no">—</td></tr>
+        <tr><td>acceptRejectAI / viewAISuggestions</td><td class="perm-yes">✓</td><td class="perm-yes">✓</td><td class="perm-yes">✓</td></tr>
+        <tr><td>joinMeeting / viewTranscript</td><td class="perm-yes">✓</td><td class="perm-yes">✓</td><td class="perm-yes">✓</td></tr>
+        <tr><td>acceptAssignedTask</td><td class="perm-yes">✓</td><td class="perm-yes">✓</td><td class="perm-yes">✓</td></tr>
+        <tr><td>removeUser</td><td class="perm-yes">✓</td><td class="perm-no">—</td><td class="perm-no">—</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:12px; font-size:9pt; color:var(--gray-600);">
+      <strong>Role derivation logic:</strong> workspace <code>owner</code> or <code>admin</code> → ADMIN role; workspace <code>manager/host</code> → HOST role; workspace <code>member/guest</code> or unauthenticated → PARTICIPANT role.
+    </p>
+  </div>
+
+  <!-- 10. WORKSPACE & NOTIFICATIONS -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#f0fdf4">🔔</div>
+      <div>
+        <div class="section-num">SECTION 10</div>
+        <h2>Workspace & Notification Flow</h2>
+      </div>
+    </div>
+    <div class="cards">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon" style="background:#eff6ff">🏢</div>
+          <h3>Workspace Lifecycle</h3>
+        </div>
+        <ul>
+          <li>User creates workspace (becomes <strong>owner</strong>)</li>
+          <li>Owner invites members by email</li>
+          <li>A <code>Notification</code> of type <code>workspace_invite</code> is created</li>
+          <li>Invited user sees it in Notifications page</li>
+          <li>On Accept → added to workspace members array</li>
+          <li>On Decline → <code>inviteStatus</code> → declined</li>
+          <li>Multiple workspaces supported per user</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon" style="background:#fef2f2">📋</div>
+          <h3>Task Assignment Flow</h3>
+        </div>
+        <ul>
+          <li>ADMIN or HOST creates a task in a workspace</li>
+          <li>Task can be assigned to any workspace member</li>
+          <li>A <code>Notification</code> of type <code>task_assigned</code> is created for the assignee</li>
+          <li>Assignee sees the new task in their dashboard</li>
+          <li>Task moves through: <strong>Todo → InProgress → Completed</strong></li>
+          <li>Due dates + priority (Low/Medium/High) supported</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11. END-TO-END USER JOURNEY -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#ffe4e6">🚀</div>
+      <div>
+        <div class="section-num">SECTION 11</div>
+        <h2>End-to-End User Journey</h2>
+      </div>
+    </div>
+    <div class="journey">
+      <div class="journey-step"><span class="js-icon">📝</span><span class="js-label">Register &amp; Verify Email</span></div>
+      <div class="journey-step"><span class="js-icon">🔑</span><span class="js-label">Login → JWT Token</span></div>
+      <div class="journey-step"><span class="js-icon">🏢</span><span class="js-label">Create Workspace</span></div>
+      <div class="journey-step"><span class="js-icon">👥</span><span class="js-label">Invite Members</span></div>
+      <div class="journey-step"><span class="js-icon">✅</span><span class="js-label">Create &amp; Assign Tasks</span></div>
+      <div class="journey-step"><span class="js-icon">📅</span><span class="js-label">Schedule Meeting</span></div>
+      <div class="journey-step"><span class="js-icon">🔔</span><span class="js-label">Receive Notifications</span></div>
+      <div class="journey-step"><span class="js-icon">📊</span><span class="js-label">Track Progress</span></div>
+    </div>
+    <div class="flow" style="margin-top:16px">
+      <div class="flow-step">
+        <div class="flow-left"><div class="flow-dot" style="background:#6366f1">A</div><div class="flow-line"></div></div>
+        <div class="flow-body">
+          <h4>New User Onboarding</h4>
+          <p>User sign up → verify email → land on dashboard. <code>AuthContext</code> stores JWT + profile. <code>WorkspaceContext</code> fetches workspaces (empty initially). User is prompted to create their first workspace.</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left"><div class="flow-dot" style="background:#0891b2">B</div><div class="flow-line"></div></div>
+        <div class="flow-body">
+          <h4>Workspace Setup</h4>
+          <p>User creates a workspace — they become the <strong>owner</strong> (ADMIN role). They can invite other users by email. Each invite triggers a notification in the invitee's account. Accepted invites add the user to the <code>members[]</code> array with a role.</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left"><div class="flow-dot" style="background:#059669">C</div><div class="flow-line"></div></div>
+        <div class="flow-body">
+          <h4>Daily Team Workflow</h4>
+          <p>ADMIN creates tasks and assigns them to members. Members see tasks in <strong>UserHome</strong> (personal) and <strong>TeamHome</strong> (team view). Tasks are updated through statuses. Meetings are scheduled and participants notified. All actions respect the RBAC permission model.</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left"><div class="flow-dot" style="background:#d97706">D</div></div>
+        <div class="flow-body">
+          <h4>Profile &amp; Settings</h4>
+          <p>User can update their bio, role name, phone, location, and website. They can change their password (current password required). Theme (dark/light) preference is persisted locally. Workspace selection persists across sessions via <code>localStorage</code>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 12. STATE PERSISTENCE -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#ecfdf5">💾</div>
+      <div>
+        <div class="section-num">SECTION 12</div>
+        <h2>State Persistence Strategy</h2>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr><th>Data</th><th>Storage</th><th>Key</th><th>Why</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>JWT Token</td><td>localStorage</td><td><code>token</code></td><td>Survives page refresh; sent with every API call</td></tr>
+        <tr><td>User Profile</td><td>localStorage</td><td><code>user_profile</code></td><td>Instant load on refresh without waiting for API</td></tr>
+        <tr><td>Selected Workspace</td><td>localStorage</td><td><code>selectedWorkspaceId</code></td><td>Remembers last workspace across sessions</td></tr>
+        <tr><td>Theme Preference</td><td>localStorage</td><td><code>theme</code></td><td>Dark/light mode persists across tabs</td></tr>
+        <tr><td>Workspace & Task Lists</td><td>React State (Context)</td><td>—</td><td>Fetched fresh from API on login / workspace switch</td></tr>
+        <tr><td>Notifications</td><td>React State (Context)</td><td>—</td><td>Fetched from API, updated on user action</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <p><strong>MeetTask</strong> — Full-Stack Project Documentation &nbsp;|&nbsp; React 19 · Node.js · MongoDB · JWT &nbsp;|&nbsp; Generated 2026</p>
+</div>
+
+</body>
+</html>

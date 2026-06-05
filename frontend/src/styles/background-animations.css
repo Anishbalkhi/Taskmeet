@@ -1,0 +1,240 @@
+/* ==========================================
+   ENHANCED BACKGROUND ANIMATIONS
+   ========================================== */
+
+/* Floating Circles */
+.floating-shape {
+    position: absolute;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(156, 163, 175, 0.1), rgba(209, 213, 219, 0.05));
+    backdrop-filter: blur(10px);
+    animation: float 20s ease-in-out infinite;
+}
+
+.circle-1 {
+    width: 300px;
+    height: 300px;
+    top: 10%;
+    right: 10%;
+    animation-delay: 0s;
+}
+
+.circle-2 {
+    width: 200px;
+    height: 200px;
+    bottom: 20%;
+    left: 15%;
+    animation-delay: 5s;
+}
+
+.circle-3 {
+    width: 150px;
+    height: 150px;
+    top: 60%;
+    right: 30%;
+    animation-delay: 10s;
+}
+
+/* Floating Squares */
+.floating-square {
+    position: absolute;
+    background: linear-gradient(135deg, rgba(107, 114, 128, 0.08), rgba(156, 163, 175, 0.04));
+    backdrop-filter: blur(8px);
+    border-radius: 20px;
+    transform: rotate(45deg);
+    animation: floatRotate 25s ease-in-out infinite;
+}
+
+.square-1 {
+    width: 200px;
+    height: 200px;
+    top: 30%;
+    left: 5%;
+    animation-delay: 3s;
+}
+
+.square-2 {
+    width: 120px;
+    height: 120px;
+    bottom: 40%;
+    right: 20%;
+    animation-delay: 8s;
+}
+
+/* Grid Pattern Overlay */
+.grid-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+        linear-gradient(rgba(156, 163, 175, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(156, 163, 175, 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: gridMove 30s linear infinite;
+}
+
+/* Animated Gradient Mesh */
+.gradient-mesh {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    right: -50%;
+    bottom: -50%;
+    background:
+        radial-gradient(circle at 20% 30%, rgba(156, 163, 175, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(107, 114, 128, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 40% 80%, rgba(75, 85, 99, 0.05) 0%, transparent 50%);
+    animation: meshRotate 40s ease-in-out infinite;
+}
+
+/* Keyframe Animations */
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    25% {
+        transform: translate(30px, -30px) scale(1.05);
+    }
+
+    50% {
+        transform: translate(-20px, 20px) scale(0.95);
+    }
+
+    75% {
+        transform: translate(20px, 30px) scale(1.02);
+    }
+}
+
+@keyframes floatRotate {
+
+    0%,
+    100% {
+        transform: translate(0, 0) rotate(45deg);
+    }
+
+    25% {
+        transform: translate(40px, -40px) rotate(60deg);
+    }
+
+    50% {
+        transform: translate(-30px, 30px) rotate(30deg);
+    }
+
+    75% {
+        transform: translate(30px, 40px) rotate(50deg);
+    }
+}
+
+@keyframes gridMove {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    100% {
+        transform: translate(50px, 50px);
+    }
+}
+
+@keyframes meshRotate {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Particle System */
+.particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: rgba(156, 163, 175, 0.3);
+    border-radius: 50%;
+    animation: particleFloat 15s ease-in-out infinite;
+}
+
+@keyframes particleFloat {
+
+    0%,
+    100% {
+        transform: translateY(0) translateX(0);
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 1;
+    }
+
+    90% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(-100vh) translateX(50px);
+        opacity: 0;
+    }
+}
+
+/* Pulsing Dots */
+.pulse-dot {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: rgba(107, 114, 128, 0.4);
+    border-radius: 50%;
+    animation: pulseDot 3s ease-in-out infinite;
+}
+
+@keyframes pulseDot {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 0.4;
+    }
+
+    50% {
+        transform: scale(1.5);
+        opacity: 0.8;
+    }
+}
+
+/* Scanning Lines */
+.scan-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(156, 163, 175, 0.2),
+            transparent);
+    animation: scanMove 8s linear infinite;
+}
+
+@keyframes scanMove {
+    0% {
+        top: 0;
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 1;
+    }
+
+    90% {
+        opacity: 1;
+    }
+
+    100% {
+        top: 100%;
+        opacity: 0;
+    }
+}
