@@ -237,8 +237,8 @@ const CreateTaskModal = ({ isOpen, onClose, onSubmit, loading = false }) => {
                                     <div className="space-y-4">
 
                                         {/* ── Status chips ── */}
-                                        <div className="flex items-center gap-4">
-                                            <label className="w-32 text-sm font-medium text-gray-500 shrink-0">Status</label>
+                                        <div className="flex flex-col xs:flex-row items-start xs:items-center gap-2 xs:gap-4">
+                                            <label className="w-full xs:w-28 sm:w-32 text-sm font-medium shrink-0" style={{ color: 'var(--text-muted)' }}>Status</label>
                                             <div className="flex gap-2 flex-wrap">
                                                 {STATUS_OPTIONS.map(opt => {
                                                     const active = formData.status === opt.value;
@@ -257,8 +257,8 @@ const CreateTaskModal = ({ isOpen, onClose, onSubmit, loading = false }) => {
                                         </div>
 
                                         {/* ── Priority chips ── */}
-                                        <div className="flex items-center gap-4">
-                                            <label className="w-32 text-sm font-medium text-gray-500 shrink-0 flex items-center gap-1.5">
+                                        <div className="flex flex-col xs:flex-row items-start xs:items-center gap-2 xs:gap-4">
+                                            <label className="w-full xs:w-28 sm:w-32 text-sm font-medium shrink-0 flex items-center gap-1.5" style={{ color: 'var(--text-muted)' }}>
                                                 <Flag className="w-3.5 h-3.5" /> Priority
                                             </label>
                                             <div className="flex gap-2 flex-wrap">
@@ -280,8 +280,8 @@ const CreateTaskModal = ({ isOpen, onClose, onSubmit, loading = false }) => {
                                         </div>
 
                                         {/* ── Due Date ── */}
-                                        <div className="flex items-center gap-4">
-                                            <label className="w-32 text-sm font-medium text-gray-500 shrink-0 flex items-center gap-1.5">
+                                        <div className="flex flex-col xs:flex-row items-start xs:items-center gap-2 xs:gap-4">
+                                            <label className="w-full xs:w-28 sm:w-32 text-sm font-medium shrink-0 flex items-center gap-1.5" style={{ color: 'var(--text-muted)' }}>
                                                 <Calendar className="w-3.5 h-3.5" /> Due date
                                             </label>
                                             <input
@@ -296,11 +296,11 @@ const CreateTaskModal = ({ isOpen, onClose, onSubmit, loading = false }) => {
 
                                         {/* ── Assignee ── */}
                                         {canAssign ? (
-                                            <div className="flex items-start gap-4">
-                                                <label className="w-32 text-sm font-medium text-gray-500 shrink-0 flex items-center gap-1.5 pt-2">
+                                            <div className="flex flex-col xs:flex-row items-start gap-2 xs:gap-4">
+                                                <label className="w-full xs:w-28 sm:w-32 text-sm font-medium shrink-0 flex items-center gap-1.5 xs:pt-2" style={{ color: 'var(--text-muted)' }}>
                                                     <Users className="w-3.5 h-3.5" /> Assignee
                                                 </label>
-                                                <div className="flex-1 relative">
+                                                <div className="flex-1 relative w-full">
                                                     {selectedMember ? (
                                                         <div className="flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/10 rounded-lg">
                                                             <div className={`w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold ${selectedMember.isCurrentUser ? "bg-[#CCFF00] text-black" : "bg-indigo-500"}`}>

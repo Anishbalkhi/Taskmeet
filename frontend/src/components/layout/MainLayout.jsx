@@ -4,7 +4,7 @@ import Header from "./Header";
 
 const MainLayout = () => {
     return (
-        <div className="min-h-screen flex bg-gray-50">
+        <div className="min-h-screen flex" style={{ background: 'var(--bg-secondary)' }}>
             
             <Sidebar />
 
@@ -14,7 +14,7 @@ const MainLayout = () => {
                 <Header />
 
                 
-                <main className="flex-1 overflow-y-auto pb-20 md:pb-0">
+                <main className="flex-1 overflow-y-auto pb-24 md:pb-0">
                     <Outlet />
                 </main>
             </div>

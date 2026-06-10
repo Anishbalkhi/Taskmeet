@@ -6,7 +6,7 @@ import axiosClient from "../api/axiosClient";
 import {
     User, Mail, Lock, Save, Camera, Bell, Shield,
     Phone, MapPin, Globe, Briefcase, CheckCircle,
-    Eye, EyeOff, AlertCircle
+    Eye, EyeOff, AlertCircle, ChevronRight
 } from "lucide-react";
 
 /* ── Avatar ──────────────────────────────────────────── */
@@ -16,7 +16,7 @@ const Avatar = ({ name, size = 80 }) => {
     return (
         <div
             style={{
-                width: size, height: size, fontSize: size * 0.36,
+                width: size, height: size, fontSize: size * 0.38,
                 background: "linear-gradient(135deg, #7c3aed, #3b82f6)",
                 color: "#fff",
                 flexShrink: 0,
@@ -28,44 +28,67 @@ const Avatar = ({ name, size = 80 }) => {
     );
 };
 
+/* ── Input component ─────────────────────────────────── */
+const Input = ({ icon: Icon, value, onChange, type = "text", placeholder, readOnly, className = "", rightEl, ...rest }) => (
+    <div className="relative">
+        {Icon && (
+            <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none"
+                style={{ color: "var(--text-muted)" }} />
+        )}
+        <input
+            type={type}
+            value={value}
+            onChange={onChange}
+            placeholder={placeholder}
+            readOnly={readOnly}
+            className={`w-full ${Icon ? "pl-9" : "pl-4"} ${rightEl ? "pr-10" : "pr-4"} py-2.5 text-sm rounded-xl outline-none transition-all ${className}`}
+            style={{
+                background: readOnly ? "var(--bg-tertiary)" : "var(--input-bg)",
+                border: "1px solid var(--input-border)",
+                color: "var(--text-primary)",
+                cursor: readOnly ? "not-allowed" : "auto",
+                opacity: readOnly ? 0.7 : 1,
+            }}
+            onFocus={(e) => { if (!readOnly) e.currentTarget.style.borderColor = "var(--border-hover)"; }}
+            onBlur={(e) => { e.currentTarget.style.borderColor = "var(--input-border)"; }}
+            {...rest}
+        />
+        {rightEl && (
+            <div className="absolute right-3 top-1/2 -translate-y-1/2">{rightEl}</div>
+        )}
+    </div>
+);
+
 /* ── Field wrapper ───────────────────────────────────── */
-const Field = ({ label, icon: Icon, hint, children }) => (
+const Field = ({ label, hint, children }) => (
     <div className="space-y-1.5">
         <label className="block text-xs font-semibold uppercase tracking-wider"
             style={{ color: "var(--text-muted)" }}>
             {label}
         </label>
-        <div className="relative">
-            {Icon && (
-                <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none"
-                    style={{ color: "var(--text-muted)" }} />
-            )}
-            {children}
-        </div>
+        {children}
         {hint && <p className="text-xs" style={{ color: "var(--text-muted)" }}>{hint}</p>}
     </div>
 );
-
-/* shared input class */
-const inp = (hasIcon = true) =>
-    `w-full ${hasIcon ? "pl-9" : "px-4"} pr-4 py-2.5 text-sm rounded-lg outline-none transition-all`;
 
 /* ── Toast ───────────────────────────────────────────── */
 const Toast = ({ type, message, onClose }) => {
     useEffect(() => { const t = setTimeout(onClose, 4000); return () => clearTimeout(t); }, [onClose]);
     return (
         <motion.div
-            initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0, y: -12, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -12, scale: 0.97 }}
             className="flex items-center gap-3 p-4 rounded-xl mb-5 text-sm font-medium"
             style={{
-                background: type === "success" ? "rgba(204,255,0,0.08)" : "rgba(239,68,68,0.08)",
-                border: `1px solid ${type === "success" ? "rgba(204,255,0,0.25)" : "rgba(239,68,68,0.35)"}`,
-                color: type === "success" ? "var(--accent-secondary)" : "#f87171",
+                background: type === "success" ? "rgba(34,197,94,0.08)" : "rgba(239,68,68,0.08)",
+                border: `1px solid ${type === "success" ? "rgba(34,197,94,0.25)" : "rgba(239,68,68,0.3)"}`,
+                color: type === "success" ? "#16a34a" : "#ef4444",
             }}
         >
             {type === "success"
-                ? <CheckCircle className="w-5 h-5 flex-shrink-0" />
-                : <AlertCircle className="w-5 h-5 flex-shrink-0" />}
+                ? <CheckCircle className="w-4 h-4 shrink-0" />
+                : <AlertCircle className="w-4 h-4 shrink-0" />}
             {message}
         </motion.div>
     );
@@ -75,10 +98,10 @@ const Toast = ({ type, message, onClose }) => {
 const PrimaryBtn = ({ children, disabled, type = "submit", onClick }) => (
     <button
         type={type} disabled={disabled} onClick={onClick}
-        className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-lg transition-all disabled:opacity-50 magnetic-hover"
+        className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl transition-all disabled:opacity-50"
         style={{ background: "var(--accent-primary)", color: "var(--text-inverse)" }}
-        onMouseEnter={(e) => !disabled && (e.currentTarget.style.background = "var(--accent-hover)")}
-        onMouseLeave={(e) => !disabled && (e.currentTarget.style.background = "var(--accent-primary)")}
+        onMouseEnter={(e) => !disabled && (e.currentTarget.style.opacity = "0.85")}
+        onMouseLeave={(e) => !disabled && (e.currentTarget.style.opacity = "1")}
     >
         {children}
     </button>
@@ -101,7 +124,6 @@ const Profile = () => {
         website: user?.website || "",
     });
 
-    /* re-seed if user context updates (fresh /me fetch) */
     useEffect(() => {
         if (user) {
             setProfile({
@@ -180,7 +202,7 @@ const Profile = () => {
     const tabs = [
         { id: "profile", label: "Profile", icon: User },
         { id: "security", label: "Security", icon: Shield },
-        { id: "notifications", label: "Notifications", icon: Bell },
+        { id: "notifications", label: "Alerts", icon: Bell },
     ];
 
     const notifLabels = {
@@ -190,164 +212,216 @@ const Profile = () => {
         mentions: { title: "Mentions & Comments", desc: "Notify when someone mentions or replies to you" },
     };
 
-    /* shared input inline style */
-    const inputStyle = {
-        background: "var(--input-bg)",
-        border: "1px solid var(--input-border)",
-        color: "var(--text-primary)",
-    };
-
     return (
         <div className="min-h-screen p-4 sm:p-6 pb-24 md:pb-6"
             style={{ background: "var(--bg-secondary)" }}>
-            <div className="max-w-3xl mx-auto">
+            <div className="max-w-2xl mx-auto">
 
-                {/* ── page header ── */}
-                <div className="mb-6">
-                    <h1 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
-                        Account Settings
-                    </h1>
-                    <p className="text-sm mt-1" style={{ color: "var(--text-muted)" }}>
-                        Manage your profile, security &amp; notification preferences
-                    </p>
-                </div>
+                {/* ── Hero card with avatar ── */}
+                <motion.div
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4 }}
+                    className="rounded-2xl overflow-hidden mb-4"
+                    style={{ background: "var(--card-bg)", border: "1px solid var(--card-border)" }}
+                >
+                    {/* Banner gradient */}
+                    <div
+                        className="h-24 sm:h-32"
+                        style={{ background: "linear-gradient(135deg, #7c3aed22, #3b82f622, #0ea5e922)" }}
+                    />
 
-                {/* ── toast ── */}
+                    <div className="px-5 sm:px-6 pb-5 -mt-10 sm:-mt-12">
+                        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+                            {/* Avatar with edit button */}
+                            <div className="relative w-fit">
+                                <div
+                                    className="rounded-full p-1"
+                                    style={{ background: "var(--card-bg)", border: "3px solid var(--card-bg)" }}
+                                >
+                                    <Avatar name={profile.name} size={72} />
+                                </div>
+                                <button
+                                    type="button"
+                                    title="Change avatar (coming soon)"
+                                    className="absolute bottom-1 right-1 w-6 h-6 rounded-full flex items-center justify-center transition-all"
+                                    style={{ background: "var(--bg-elevated)", border: "1.5px solid var(--border-primary)" }}
+                                >
+                                    <Camera className="w-3 h-3" style={{ color: "var(--text-secondary)" }} />
+                                </button>
+                            </div>
+
+                            {/* Role badges */}
+                            <div className="flex flex-wrap items-center gap-2 pb-1">
+                                {roleConfig && (
+                                    <span
+                                        className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full"
+                                        style={{ background: roleConfig.color, color: roleConfig.textColor }}
+                                    >
+                                        {roleConfig.emoji} {roleConfig.label}
+                                    </span>
+                                )}
+                                {user?.isEmailVerified && (
+                                    <div
+                                        className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full"
+                                        style={{ background: "rgba(34,197,94,0.12)", color: "#16a34a" }}
+                                    >
+                                        <CheckCircle className="w-3.5 h-3.5" />
+                                        Verified
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="mt-3">
+                            <h2 className="text-lg sm:text-xl font-bold" style={{ color: "var(--text-primary)" }}>
+                                {profile.name || "Your Name"}
+                            </h2>
+                            <p className="text-sm" style={{ color: "var(--text-muted)" }}>
+                                {profile.email}
+                                {profile.roleName && (
+                                    <span className="ml-2">· {profile.roleName}</span>
+                                )}
+                            </p>
+                            {profile.bio && (
+                                <p className="text-sm mt-1.5 line-clamp-2" style={{ color: "var(--text-secondary)" }}>
+                                    {profile.bio}
+                                </p>
+                            )}
+                        </div>
+                    </div>
+                </motion.div>
+
+                {/* ── Toast ── */}
                 <AnimatePresence>
                     {toast && <Toast key={toast.text} type={toast.type} message={toast.text} onClose={() => setToast(null)} />}
                 </AnimatePresence>
 
-                {/* ── main card ── */}
-                <div className="rounded-2xl overflow-hidden"
-                    style={{ background: "var(--card-bg)", border: "1px solid var(--card-border)" }}>
-
-                    {/* tab bar */}
-                    <div style={{ borderBottom: "1px solid var(--border-primary)" }}>
-                        <div className="flex overflow-x-auto">
-                            {tabs.map((tab) => {
-                                const active = activeTab === tab.id;
-                                return (
-                                    <button
-                                        key={tab.id}
-                                        onClick={() => setActiveTab(tab.id)}
-                                        className="flex items-center gap-2 px-6 py-4 text-sm font-medium whitespace-nowrap transition-all"
-                                        style={{
-                                            color: active ? "var(--accent-secondary)" : "var(--text-muted)",
-                                            borderBottom: active ? "2px solid var(--accent-secondary)" : "2px solid transparent",
-                                            background: active ? "rgba(204,255,0,0.04)" : "transparent",
-                                        }}
-                                    >
-                                        <tab.icon className="w-4 h-4" />
-                                        {tab.label}
-                                    </button>
-                                );
-                            })}
-                        </div>
+                {/* ── Tab card ── */}
+                <motion.div
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.08 }}
+                    className="rounded-2xl overflow-hidden"
+                    style={{ background: "var(--card-bg)", border: "1px solid var(--card-border)" }}
+                >
+                    {/* Tab bar */}
+                    <div className="flex overflow-x-auto" style={{ borderBottom: "1px solid var(--border-primary)" }}>
+                        {tabs.map((tab) => {
+                            const active = activeTab === tab.id;
+                            return (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id)}
+                                    className="flex items-center gap-2 px-5 py-3.5 text-sm font-medium whitespace-nowrap transition-all relative"
+                                    style={{
+                                        color: active ? "var(--text-primary)" : "var(--text-muted)",
+                                        background: "transparent",
+                                    }}
+                                >
+                                    <tab.icon className="w-4 h-4" />
+                                    {tab.label}
+                                    {active && (
+                                        <motion.div
+                                            layoutId="tabIndicator"
+                                            className="absolute bottom-0 left-0 right-0 h-0.5 rounded-t"
+                                            style={{ background: "var(--accent-primary)" }}
+                                        />
+                                    )}
+                                </button>
+                            );
+                        })}
                     </div>
 
-                    <div className="p-6">
+                    <div className="p-5 sm:p-6">
                         <AnimatePresence mode="wait">
 
                             {/* ══ PROFILE TAB ══ */}
                             {activeTab === "profile" && (
                                 <motion.form key="profile"
                                     initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }}
-                                    onSubmit={handleProfileSave} className="space-y-7"
+                                    exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.18 }}
+                                    onSubmit={handleProfileSave} className="space-y-5"
                                 >
-                                    {/* avatar strip */}
-                                    <div className="flex items-center gap-5 p-4 rounded-xl"
-                                        style={{ background: "var(--bg-hover)", border: "1px solid var(--border-primary)" }}>
-                                        <div className="relative">
-                                            <Avatar name={profile.name} size={72} />
-                                            <button type="button" title="Change avatar (coming soon)"
-                                                className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center transition-all"
-                                                style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-primary)" }}>
-                                                <Camera className="w-3 h-3" style={{ color: "var(--text-secondary)" }} />
-                                            </button>
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <p className="font-semibold truncate" style={{ color: "var(--text-primary)" }}>
-                                                {profile.name || "Your Name"}
-                                            </p>
-                                            <p className="text-sm truncate" style={{ color: "var(--text-muted)" }}>
-                                                {profile.email}
-                                            </p>
-                                            {profile.roleName && (
-                                                <span className="inline-flex items-center gap-1 mt-1.5 text-xs font-semibold px-2 py-0.5 rounded-full"
-                                                    style={{ background: "rgba(204,255,0,0.12)", color: "var(--accent-secondary)" }}>
-                                                    <Briefcase className="w-3 h-3" />
-                                                    {profile.roleName}
-                                                </span>
-                                            )}
-                                        </div>
-                                        {/* RBAC role badge */}
-                                        <div className="flex flex-col items-end gap-2 flex-shrink-0">
-                                            {roleConfig && (
-                                                <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full"
-                                                    style={{ background: roleConfig.color, color: roleConfig.textColor }}>
-                                                    {roleConfig.emoji} {roleConfig.label}
-                                                </span>
-                                            )}
-                                            {user?.isEmailVerified && (
-                                                <div className="flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full"
-                                                    style={{ background: "rgba(204,255,0,0.1)", color: "var(--accent-secondary)" }}>
-                                                    <CheckCircle className="w-3.5 h-3.5" />
-                                                    Verified
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    {/* fields grid */}
-                                    <div className="grid sm:grid-cols-2 gap-5">
-                                        <Field label="Full Name" icon={User}>
-                                            <input type="text" value={profile.name} required
+                                    <div className="grid sm:grid-cols-2 gap-4">
+                                        <Field label="Full Name">
+                                            <Input
+                                                icon={User}
+                                                value={profile.name}
                                                 onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-                                                className={inp()} style={inputStyle} placeholder="Jane Doe" />
+                                                placeholder="Jane Doe"
+                                                required
+                                            />
                                         </Field>
 
-                                        <Field label="Email Address" icon={Mail}>
-                                            <input type="email" value={profile.email} readOnly
-                                                className={inp()} title="Email cannot be changed here"
-                                                style={{ ...inputStyle, cursor: "not-allowed", opacity: 0.6 }} />
+                                        <Field label="Email Address">
+                                            <Input
+                                                icon={Mail}
+                                                value={profile.email}
+                                                type="email"
+                                                readOnly
+                                                placeholder="you@example.com"
+                                            />
                                         </Field>
 
-                                        <Field label="Role / Job Title" icon={Briefcase}>
-                                            <input type="text" value={profile.roleName}
+                                        <Field label="Role / Job Title">
+                                            <Input
+                                                icon={Briefcase}
+                                                value={profile.roleName}
                                                 onChange={(e) => setProfile({ ...profile, roleName: e.target.value })}
-                                                className={inp()} style={inputStyle} placeholder="e.g. Frontend Developer" />
+                                                placeholder="e.g. Frontend Developer"
+                                            />
                                         </Field>
 
-                                        <Field label="Phone Number" icon={Phone}>
-                                            <input type="tel" value={profile.phone}
+                                        <Field label="Phone Number">
+                                            <Input
+                                                icon={Phone}
+                                                value={profile.phone}
+                                                type="tel"
                                                 onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                                                className={inp()} style={inputStyle} placeholder="+91 98765 43210" />
+                                                placeholder="+91 98765 43210"
+                                            />
                                         </Field>
 
-                                        <Field label="Location" icon={MapPin}>
-                                            <input type="text" value={profile.location}
+                                        <Field label="Location">
+                                            <Input
+                                                icon={MapPin}
+                                                value={profile.location}
                                                 onChange={(e) => setProfile({ ...profile, location: e.target.value })}
-                                                className={inp()} style={inputStyle} placeholder="Mumbai, India" />
+                                                placeholder="Mumbai, India"
+                                            />
                                         </Field>
 
-                                        <Field label="Website / Portfolio" icon={Globe}>
-                                            <input type="url" value={profile.website}
+                                        <Field label="Website / Portfolio">
+                                            <Input
+                                                icon={Globe}
+                                                value={profile.website}
+                                                type="url"
                                                 onChange={(e) => setProfile({ ...profile, website: e.target.value })}
-                                                className={inp()} style={inputStyle} placeholder="https://yoursite.com" />
+                                                placeholder="https://yoursite.com"
+                                            />
                                         </Field>
                                     </div>
 
-                                    {/* bio */}
                                     <Field label={`Bio (${profile.bio.length}/300)`}>
-                                        <textarea value={profile.bio} rows={4} maxLength={300}
+                                        <textarea
+                                            value={profile.bio}
+                                            rows={3}
+                                            maxLength={300}
                                             onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
-                                            className="w-full px-4 py-2.5 text-sm rounded-lg outline-none transition-all resize-none"
-                                            style={inputStyle}
-                                            placeholder="Tell your team a bit about yourself…" />
+                                            placeholder="Tell your team a bit about yourself…"
+                                            className="w-full px-4 py-2.5 text-sm rounded-xl outline-none transition-all resize-none"
+                                            style={{
+                                                background: "var(--input-bg)",
+                                                border: "1px solid var(--input-border)",
+                                                color: "var(--text-primary)"
+                                            }}
+                                            onFocus={(e) => e.currentTarget.style.borderColor = "var(--border-hover)"}
+                                            onBlur={(e) => e.currentTarget.style.borderColor = "var(--input-border)"}
+                                        />
                                     </Field>
 
-                                    <div className="flex justify-end">
+                                    <div className="flex justify-end pt-1">
                                         <PrimaryBtn disabled={loading}>
                                             <Save className="w-4 h-4" />
                                             {loading ? "Saving…" : "Save Profile"}
@@ -360,39 +434,58 @@ const Profile = () => {
                             {activeTab === "security" && (
                                 <motion.div key="security"
                                     initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }}>
+                                    exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.18 }}>
 
-                                    {/* status card */}
-                                    <div className="flex items-center gap-3 p-4 rounded-xl mb-6"
-                                        style={{ background: "rgba(204,255,0,0.06)", border: "1px solid rgba(204,255,0,0.2)" }}>
-                                        <CheckCircle className="w-5 h-5 flex-shrink-0" style={{ color: "var(--accent-secondary)" }} />
+                                    {/* Email status */}
+                                    <div
+                                        className="flex items-center gap-3 p-4 rounded-xl mb-5"
+                                        style={{
+                                            background: user?.isEmailVerified
+                                                ? "rgba(34,197,94,0.07)"
+                                                : "rgba(239,68,68,0.07)",
+                                            border: `1px solid ${user?.isEmailVerified ? "rgba(34,197,94,0.25)" : "rgba(239,68,68,0.25)"}`
+                                        }}
+                                    >
+                                        <CheckCircle className="w-5 h-5 shrink-0" style={{ color: user?.isEmailVerified ? "#16a34a" : "#ef4444" }} />
                                         <div>
-                                            <p className="text-sm font-semibold" style={{ color: "var(--accent-secondary)" }}>
+                                            <p className="text-sm font-semibold" style={{ color: user?.isEmailVerified ? "#16a34a" : "#ef4444" }}>
                                                 {user?.isEmailVerified ? "Email verified" : "Email not verified"}
                                             </p>
                                             <p className="text-xs" style={{ color: "var(--text-muted)" }}>{profile.email}</p>
                                         </div>
                                     </div>
 
-                                    <form onSubmit={handlePasswordChange} className="space-y-5">
-                                        <h3 className="font-semibold text-sm uppercase tracking-wider"
-                                            style={{ color: "var(--text-secondary)" }}>Change Password</h3>
+                                    <form onSubmit={handlePasswordChange} className="space-y-4">
+                                        <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "var(--text-muted)" }}>
+                                            Change Password
+                                        </p>
 
                                         {[
                                             { key: "current", label: "Current Password" },
                                             { key: "next", label: "New Password", hint: "Minimum 8 characters" },
                                             { key: "confirm", label: "Confirm New Password" },
                                         ].map(({ key, label, hint }) => (
-                                            <Field key={key} label={label} icon={Lock} hint={hint}>
-                                                <input type={showPw[key] ? "text" : "password"} value={passwords[key]} required
+                                            <Field key={key} label={label} hint={hint}>
+                                                <Input
+                                                    icon={Lock}
+                                                    type={showPw[key] ? "text" : "password"}
+                                                    value={passwords[key]}
                                                     onChange={(e) => setPasswords({ ...passwords, [key]: e.target.value })}
-                                                    className={`${inp()} pr-10`} style={inputStyle} />
-                                                <button type="button" tabIndex={-1}
-                                                    onClick={() => setShowPw((s) => ({ ...s, [key]: !s[key] }))}
-                                                    className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors"
-                                                    style={{ color: "var(--text-muted)" }}>
-                                                    {showPw[key] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                                                </button>
+                                                    required
+                                                    rightEl={
+                                                        <button
+                                                            type="button"
+                                                            tabIndex={-1}
+                                                            onClick={() => setShowPw(s => ({ ...s, [key]: !s[key] }))}
+                                                            style={{ color: "var(--text-muted)" }}
+                                                            className="transition-colors"
+                                                            onMouseEnter={(e) => e.currentTarget.style.color = "var(--text-primary)"}
+                                                            onMouseLeave={(e) => e.currentTarget.style.color = "var(--text-muted)"}
+                                                        >
+                                                            {showPw[key] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                                        </button>
+                                                    }
+                                                />
                                             </Field>
                                         ))}
 
@@ -410,41 +503,45 @@ const Profile = () => {
                             {activeTab === "notifications" && (
                                 <motion.div key="notifications"
                                     initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }}
-                                    className="space-y-6">
+                                    exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.18 }}
+                                    className="space-y-1"
+                                >
+                                    <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: "var(--text-muted)" }}>
+                                        Notification Preferences
+                                    </p>
 
-                                    <h3 className="font-semibold text-sm uppercase tracking-wider"
-                                        style={{ color: "var(--text-secondary)" }}>Notification Preferences</h3>
-
-                                    <div style={{ borderTop: "1px solid var(--border-primary)" }}>
-                                        {Object.entries(notifLabels).map(([key, { title, desc }]) => {
-                                            const on = notifications[key];
-                                            return (
-                                                <div key={key}
-                                                    className="flex items-center justify-between py-4"
-                                                    style={{ borderBottom: "1px solid var(--border-primary)" }}>
-                                                    <div>
-                                                        <p className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>{title}</p>
-                                                        <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>{desc}</p>
-                                                    </div>
-                                                    <button type="button"
-                                                        onClick={() => setNotifications((n) => ({ ...n, [key]: !n[key] }))}
-                                                        className="relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-all"
-                                                        style={{ background: on ? "var(--accent-secondary)" : "var(--bg-active)" }}>
-                                                        <span
-                                                            className="inline-block h-4 w-4 rounded-full transition-transform"
-                                                            style={{
-                                                                background: on ? "#111" : "var(--text-muted)",
-                                                                transform: on ? "translateX(24px)" : "translateX(4px)",
-                                                            }}
-                                                        />
-                                                    </button>
+                                    {Object.entries(notifLabels).map(([key, { title, desc }]) => {
+                                        const on = notifications[key];
+                                        return (
+                                            <div
+                                                key={key}
+                                                className="flex items-center justify-between py-3.5 px-1"
+                                                style={{ borderBottom: "1px solid var(--border-primary)" }}
+                                            >
+                                                <div className="flex-1 min-w-0 pr-4">
+                                                    <p className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>{title}</p>
+                                                    <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>{desc}</p>
                                                 </div>
-                                            );
-                                        })}
-                                    </div>
+                                                {/* Toggle switch */}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setNotifications(n => ({ ...n, [key]: !n[key] }))}
+                                                    className="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-all"
+                                                    style={{ background: on ? "var(--accent-primary)" : "var(--bg-active)" }}
+                                                >
+                                                    <span
+                                                        className="inline-block h-4 w-4 rounded-full transition-transform"
+                                                        style={{
+                                                            background: on ? "var(--text-inverse)" : "var(--text-muted)",
+                                                            transform: on ? "translateX(24px)" : "translateX(4px)",
+                                                        }}
+                                                    />
+                                                </button>
+                                            </div>
+                                        );
+                                    })}
 
-                                    <div className="flex justify-end pt-2">
+                                    <div className="flex justify-end pt-4">
                                         <PrimaryBtn type="button" onClick={handleNotifSave} disabled={loading}>
                                             <Save className="w-4 h-4" />
                                             Save Preferences
@@ -455,7 +552,7 @@ const Profile = () => {
 
                         </AnimatePresence>
                     </div>
-                </div>
+                </motion.div>
             </div>
         </div>
     );

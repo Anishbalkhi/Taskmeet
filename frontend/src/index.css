@@ -143,17 +143,35 @@ pre {
     --wide: 1280px;
 }
 
+/* xs breakpoint (480px) - utility classes */
+@media (min-width: 480px) {
+    .xs\:inline { display: inline !important; }
+    .xs\:hidden { display: none !important; }
+    .xs\:block { display: block !important; }
+    .xs\:flex { display: flex !important; }
+}
+@media (max-width: 479px) {
+    .xs\:inline { display: none !important; }
+    .xs\:hidden { display: inline !important; }
+}
+
 /* Touch-Friendly Interactions */
 @media (hover: none) and (pointer: coarse) {
+    /* Increase touch targets on nav/interactive elements */
+    nav button,
+    nav a,
+    header button,
+    header a {
+        min-height: 40px;
+        min-width: 40px;
+    }
 
-    /* Increase touch targets on mobile */
-    button,
-    a,
+    /* Form inputs */
     input,
     select,
     textarea {
-        min-height: 44px;
-        min-width: 44px;
+        min-height: 40px;
+        font-size: 16px; /* prevent zoom on iOS */
     }
 
     /* Disable hover effects on touch devices */
@@ -188,10 +206,14 @@ html {
 
 /* Safe Area Insets for Notched Devices */
 @supports (padding: env(safe-area-inset-left)) {
-    body {
-        padding-left: env(safe-area-inset-left);
-        padding-right: env(safe-area-inset-right);
+    .safe-area-inset-bottom {
         padding-bottom: env(safe-area-inset-bottom);
+    }
+    /* Give the main layout extra bottom padding on mobile to clear the bottom nav + notch */
+    @media (max-width: 768px) {
+        main {
+            padding-bottom: max(80px, calc(60px + env(safe-area-inset-bottom))) !important;
+        }
     }
 }
 
@@ -215,6 +237,36 @@ body {
     transition-duration: 200ms;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* Themed native select elements */
+select {
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    color: var(--text-primary);
+    border-radius: 0.5rem;
+}
+
+[data-theme="dark"] select,
+select {
+    color-scheme: dark;
+}
+
+[data-theme="light"] select {
+    color-scheme: light;
+}
+
+select option {
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+}
+
+/* Mobile: prevent any content from going under bottom nav */
+@media (max-width: 767px) {
+    .pb-20 {
+        padding-bottom: 5rem !important;
+    }
+}
+
 
 /* ==========================================
    ENHANCED TEXT ANIMATIONS
